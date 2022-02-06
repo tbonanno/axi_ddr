@@ -37,44 +37,45 @@ architecture rtl of axi_ddr is
   signal aresetn        : std_logic;
   signal aresetn_vector : std_logic_vector(0 downto 0);
 
-  signal araddr  : std_logic_vector(31 downto 0);
-  signal arburst : std_logic_vector( 1 downto 0);
-  signal arcache : std_logic_vector( 3 downto 0);
-  signal arid    : std_logic_vector( 5 downto 0);
-  signal arlen   : std_logic_vector( 7 downto 0);
-  signal arlock  : std_logic_vector( 0 downto 0);
-  signal arprot  : std_logic_vector( 2 downto 0);
-  signal arqos   : std_logic_vector( 3 downto 0);
-  signal arready : std_logic;
-  signal arsize  : std_logic_vector( 2 downto 0);
-  signal arvalid : std_logic_vector( 0 downto 0);
-  signal awaddr  : std_logic_vector(31 downto 0);
-  signal awburst : std_logic_vector( 1 downto 0);
-  signal awcache : std_logic_vector( 3 downto 0);
-  signal awid    : std_logic_vector( 5 downto 0);
-  signal awlen   : std_logic_vector( 7 downto 0);
-  signal awlock  : std_logic_vector( 0 downto 0);
-  signal awprot  : std_logic_vector( 2 downto 0);
-  signal awqos   : std_logic_vector( 3 downto 0);
-  signal awready : std_logic;
-  signal awsize  : std_logic_vector( 2 downto 0);
-  signal awvalid : std_logic;
-  signal bid     : std_logic_vector( 5 downto 0);
-  signal bready  : std_logic;
-  signal bresp   : std_logic_vector( 1 downto 0);
-  signal bvalid  : std_logic;
-  signal rdata   : std_logic_vector(31 downto 0);
-  signal rid     : std_logic_vector( 5 downto 0);
-  signal rlast   : std_logic;
-  signal rready  : std_logic;
-  signal rresp   : std_logic_vector( 1 downto 0);
-  signal rvalid  : std_logic;
-  signal wdata   : std_logic_vector(31 downto 0);
-  signal wid     : std_logic_vector( 5 downto 0);
-  signal wlast   : std_logic_vector( 0 downto 0);
-  signal wready  : std_logic;
-  signal wstrb   : std_logic_vector( 3 downto 0);
-  signal wvalid  : std_logic;
+  signal araddr        : std_logic_vector(31 downto 0);
+  signal arburst       : std_logic_vector( 1 downto 0);
+  signal arcache       : std_logic_vector( 3 downto 0);
+  signal arid          : std_logic_vector( 5 downto 0);
+  signal arlen         : std_logic_vector( 7 downto 0);
+  signal arlock        : std_logic_vector( 0 downto 0);
+  signal arprot        : std_logic_vector( 2 downto 0);
+  signal arqos         : std_logic_vector( 3 downto 0);
+  signal arready       : std_logic;
+  signal arregion      : std_logic_vector( 3 downto 0);
+  signal arsize        : std_logic_vector( 2 downto 0);
+  signal arvalid       : std_logic;
+  signal awaddr        : std_logic_vector(31 downto 0);
+  signal awburst       : std_logic_vector( 1 downto 0);
+  signal awcache       : std_logic_vector( 3 downto 0);
+  signal awid          : std_logic_vector( 5 downto 0);
+  signal awlen         : std_logic_vector( 7 downto 0);
+  signal awlock        : std_logic_vector( 0 downto 0);
+  signal awprot        : std_logic_vector( 2 downto 0);
+  signal awqos         : std_logic_vector( 3 downto 0);
+  signal awready       : std_logic;
+  signal awregion      : std_logic_vector( 3 downto 0);
+  signal awsize        : std_logic_vector( 2 downto 0);
+  signal awvalid       : std_logic;
+  signal bid           : std_logic_vector( 5 downto 0);
+  signal bready        : std_logic;
+  signal bresp         : std_logic_vector( 1 downto 0);
+  signal bvalid        : std_logic;
+  signal rdata         : std_logic_vector(31 downto 0);
+  signal rid           : std_logic_vector( 5 downto 0);
+  signal rlast         : std_logic;
+  signal rready        : std_logic;
+  signal rresp         : std_logic_vector( 1 downto 0);
+  signal rvalid        : std_logic;
+  signal wdata         : std_logic_vector(31 downto 0);
+  signal wlast         : std_logic;
+  signal wready        : std_logic;
+  signal wstrb         : std_logic_vector( 3 downto 0);
+  signal wvalid        : std_logic;
 
   type burst_state is (IDLE, RUN);
   signal burst_cur_state, burst_nxt_state : burst_state;
@@ -85,64 +86,68 @@ architecture rtl of axi_ddr is
 
 component design_1_wrapper
   port (
-    DDR_addr            : inout std_logic_vector(14 downto 0);
-    DDR_ba              : inout std_logic_vector( 2 downto 0);
-    DDR_cas_n           : inout std_logic;
-    DDR_ck_n            : inout std_logic;
-    DDR_ck_p            : inout std_logic;
-    DDR_cke             : inout std_logic;
-    DDR_cs_n            : inout std_logic;
-    DDR_dm              : inout std_logic_vector( 3 downto 0);
-    DDR_dq              : inout std_logic_vector(31 downto 0);
-    DDR_dqs_n           : inout std_logic_vector( 3 downto 0);
-    DDR_dqs_p           : inout std_logic_vector( 3 downto 0);
-    DDR_odt             : inout std_logic;
-    DDR_ras_n           : inout std_logic;
-    DDR_reset_n         : inout std_logic;
-    DDR_we_n            : inout std_logic;
-    FCLK_CLK0           : out   std_logic;
-    FIXED_IO_ddr_vrn    : inout std_logic;
-    FIXED_IO_ddr_vrp    : inout std_logic;
-    FIXED_IO_mio        : inout std_logic_vector(53 downto 0);
-    FIXED_IO_ps_clk     : inout std_logic;
-    FIXED_IO_ps_porb    : inout std_logic;
-    FIXED_IO_ps_srstb   : inout std_logic;
-    AXI_arregion  : in    std_logic_vector( 3 downto 0);
-    AXI_awregion  : in    std_logic_vector( 3 downto 0);
-    AXI_araddr    : in    std_logic_vector(31 downto 0);
-    AXI_arburst   : in    std_logic_vector( 1 downto 0);
-    AXI_arcache   : in    std_logic_vector( 3 downto 0);
-    AXI_arlen     : in    std_logic_vector( 7 downto 0);
-    AXI_arlock    : in    std_logic_vector( 0 downto 0);
-    AXI_arprot    : in    std_logic_vector( 2 downto 0);
-    AXI_arqos     : in    std_logic_vector( 3 downto 0);
-    AXI_arready   : out   std_logic;
-    AXI_arsize    : in    std_logic_vector( 2 downto 0);
-    AXI_arvalid   : in    std_logic;
-    AXI_awaddr    : in    std_logic_vector(31 downto 0);
-    AXI_awburst   : in    std_logic_vector( 1 downto 0);
-    AXI_awcache   : in    std_logic_vector( 3 downto 0);
-    AXI_awlen     : in    std_logic_vector( 7 downto 0);
-    AXI_awlock    : in    std_logic_vector( 0 downto 0);
-    AXI_awprot    : in    std_logic_vector( 2 downto 0);
-    AXI_awqos     : in    std_logic_vector( 3 downto 0);
-    AXI_awready   : out   std_logic;
-    AXI_awsize    : in    std_logic_vector( 2 downto 0);
-    AXI_awvalid   : in    std_logic;
-    AXI_bready    : in    std_logic;
-    AXI_bresp     : out   std_logic_vector( 1 downto 0);
-    AXI_bvalid    : out   std_logic;
-    AXI_rdata     : out   std_logic_vector(31 downto 0);
-    AXI_rlast     : out   std_logic;
-    AXI_rready    : in    std_logic;
-    AXI_rresp     : out   std_logic_vector( 1 downto 0);
-    AXI_rvalid    : out   std_logic;
-    AXI_wdata     : in    std_logic_vector(31 downto 0);
-    AXI_wlast     : in    std_logic;
-    AXI_wready    : out   std_logic;
-    AXI_wstrb     : in    std_logic_vector( 3 downto 0);
-    AXI_wvalid    : in    std_logic;
-    ARESETN           : in    std_logic
+    ARESETN           : in    std_logic;
+    AXI_araddr        : in    std_logic_vector(31 downto 0);
+    AXI_arburst       : in    std_logic_vector( 1 downto 0);
+    AXI_arcache       : in    std_logic_vector( 3 downto 0);
+    AXI_arid          : in    std_logic_vector( 5 downto 0);
+    AXI_arlen         : in    std_logic_vector( 7 downto 0);
+    AXI_arlock        : in    std_logic_vector( 0 downto 0);
+    AXI_arprot        : in    std_logic_vector( 2 downto 0);
+    AXI_arqos         : in    std_logic_vector( 3 downto 0);
+    AXI_arready       : out   std_logic;
+    AXI_arregion      : in    std_logic_vector( 3 downto 0);
+    AXI_arsize        : in    std_logic_vector( 2 downto 0);
+    AXI_arvalid       : in    std_logic;
+    AXI_awaddr        : in    std_logic_vector(31 downto 0);
+    AXI_awburst       : in    std_logic_vector( 1 downto 0);
+    AXI_awcache       : in    std_logic_vector( 3 downto 0);
+    AXI_awid          : in    std_logic_vector( 5 downto 0);
+    AXI_awlen         : in    std_logic_vector( 7 downto 0);
+    AXI_awlock        : in    std_logic_vector( 0 downto 0);
+    AXI_awprot        : in    std_logic_vector( 2 downto 0);
+    AXI_awqos         : in    std_logic_vector( 3 downto 0);
+    AXI_awready       : out   std_logic;
+    AXI_awregion      : in    std_logic_vector( 3 downto 0);
+    AXI_awsize        : in    std_logic_vector( 2 downto 0);
+    AXI_awvalid       : in    std_logic;
+    AXI_bid           : out   std_logic_vector( 5 downto 0);
+    AXI_bready        : in    std_logic;
+    AXI_bresp         : out   std_logic_vector( 1 downto 0);
+    AXI_bvalid        : out   std_logic;
+    AXI_rdata         : out   std_logic_vector(31 downto 0);
+    AXI_rid           : out   std_logic_vector( 5 downto 0);
+    AXI_rlast         : out   std_logic;
+    AXI_rready        : in    std_logic;
+    AXI_rresp         : out   std_logic_vector( 1 downto 0);
+    AXI_rvalid        : out   std_logic;
+    AXI_wdata         : in    std_logic_vector(31 downto 0);
+    AXI_wlast         : in    std_logic;
+    AXI_wready        : out   std_logic;
+    AXI_wstrb         : in    std_logic_vector( 3 downto 0);
+    AXI_wvalid        : in    std_logic;
+    DDR_addr          : inout std_logic_vector(14 downto 0);
+    DDR_ba            : inout std_logic_vector( 2 downto 0);
+    DDR_cas_n         : inout std_logic;
+    DDR_ck_n          : inout std_logic;
+    DDR_ck_p          : inout std_logic;
+    DDR_cke           : inout std_logic;
+    DDR_cs_n          : inout std_logic;
+    DDR_dm            : inout std_logic_vector( 3 downto 0);
+    DDR_dq            : inout std_logic_vector(31 downto 0);
+    DDR_dqs_n         : inout std_logic_vector( 3 downto 0);
+    DDR_dqs_p         : inout std_logic_vector( 3 downto 0);
+    DDR_odt           : inout std_logic;
+    DDR_ras_n         : inout std_logic;
+    DDR_reset_n       : inout std_logic;
+    DDR_we_n          : inout std_logic;
+    FCLK_CLK0         : out   std_logic;
+    FIXED_IO_ddr_vrn  : inout std_logic;
+    FIXED_IO_ddr_vrp  : inout std_logic;
+    FIXED_IO_mio      : inout std_logic_vector(53 downto 0);
+    FIXED_IO_ps_clk   : inout std_logic;
+    FIXED_IO_ps_porb  : inout std_logic;
+    FIXED_IO_ps_srstb : inout std_logic
   );
 end component;
 
@@ -254,77 +259,73 @@ process(all) begin
 
   wdata <= "00000" & cb_count_q & "0000" & cb_word_q;
   awaddr <= std_logic_vector(unsigned("0000000" & cb_count_q & cb_word_q & "00") + X"0010_0000");
-  wstrb <= "1111";
-  bready <= '1';
-  rready <= '1';
-  awsize <= "010";
-  awlen <= "11111111";
-  awburst <= "01";
-
-  aresetn <= aresetn_vector(0);
 
 end process;
 
 u_design_1_wrapper : design_1_wrapper
   port map (
-    DDR_addr            => DDR_addr,          -- inout std_logic_vector(14 downto 0);
-    DDR_ba              => DDR_ba,            -- inout std_logic_vector( 2 downto 0);
-    DDR_cas_n           => DDR_cas_n,         -- inout std_logic;
-    DDR_ck_n            => DDR_ck_n,          -- inout std_logic;
-    DDR_ck_p            => DDR_ck_p,          -- inout std_logic;
-    DDR_cke             => DDR_cke,           -- inout std_logic;
-    DDR_cs_n            => DDR_cs_n,          -- inout std_logic;
-    DDR_dm              => DDR_dm,            -- inout std_logic_vector( 3 downto 0);
-    DDR_dq              => DDR_dq,            -- inout std_logic_vector(31 downto 0);
-    DDR_dqs_n           => DDR_dqs_n,         -- inout std_logic_vector( 3 downto 0);
-    DDR_dqs_p           => DDR_dqs_p,         -- inout std_logic_vector( 3 downto 0);
-    DDR_odt             => DDR_odt,           -- inout std_logic;
-    DDR_ras_n           => DDR_ras_n,         -- inout std_logic;
-    DDR_reset_n         => DDR_reset_n,       -- inout std_logic;
-    DDR_we_n            => DDR_we_n,          -- inout std_logic;
-    FCLK_CLK0           => FCLK_CLK0,         -- out   std_logic;
-    FIXED_IO_ddr_vrn    => FIXED_IO_ddr_vrn,  -- inout std_logic;
-    FIXED_IO_ddr_vrp    => FIXED_IO_ddr_vrp,  -- inout std_logic;
-    FIXED_IO_mio        => FIXED_IO_mio,      -- inout std_logic_vector(53 downto 0);
-    FIXED_IO_ps_clk     => FIXED_IO_ps_clk,   -- inout std_logic;
-    FIXED_IO_ps_porb    => FIXED_IO_ps_porb,  -- inout std_logic;
-    FIXED_IO_ps_srstb   => FIXED_IO_ps_srstb, -- inout std_logic;
-    AXI_arregion  => "0000",            -- in    std_logic_vector( 3 downto 0);
-    AXI_awregion  => "0000",            -- in    std_logic_vector( 3 downto 0);
-    AXI_araddr    => araddr,            -- in    std_logic_vector(31 downto 0);
-    AXI_arburst   => arburst,           -- in    std_logic_vector( 1 downto 0);
-    AXI_arcache   => arcache,           -- in    std_logic_vector( 3 downto 0);
-    AXI_arlen     => arlen,             -- in    std_logic_vector( 7 downto 0);
-    AXI_arlock    => arlock,            -- in    std_logic_vector( 0 downto 0);
-    AXI_arprot    => arprot,            -- in    std_logic_vector( 2 downto 0);
-    AXI_arqos     => arqos,             -- in    std_logic_vector( 3 downto 0);
-    AXI_arready   => arready,           -- out   std_logic;
-    AXI_arsize    => arsize,            -- in    std_logic_vector( 2 downto 0);
-    AXI_arvalid   => arvalid(0),        -- in    std_logic;
-    AXI_awaddr    => awaddr,            -- in    std_logic_vector(31 downto 0);
-    AXI_awburst   => awburst,           -- in    std_logic_vector( 1 downto 0);
-    AXI_awcache   => awcache,           -- in    std_logic_vector( 3 downto 0);
-    AXI_awlen     => awlen,             -- in    std_logic_vector( 7 downto 0);
-    AXI_awlock    => awlock,            -- in    std_logic_vector( 0 downto 0);
-    AXI_awprot    => awprot,            -- in    std_logic_vector( 2 downto 0);
-    AXI_awqos     => awqos,             -- in    std_logic_vector( 3 downto 0);
-    AXI_awready   => awready,           -- out   std_logic;
-    AXI_awsize    => awsize,            -- in    std_logic_vector( 2 downto 0);
-    AXI_awvalid   => awvalid,           -- in    std_logic;
-    AXI_bready    => bready,            -- in    std_logic;
-    AXI_bresp     => bresp,             -- out   std_logic_vector( 1 downto 0);
-    AXI_bvalid    => bvalid,            -- out   std_logic;
-    AXI_rdata     => rdata,             -- out   std_logic_vector(31 downto 0);
-    AXI_rlast     => rlast,             -- out   std_logic;
-    AXI_rready    => rready,            -- in    std_logic;
-    AXI_rresp     => rresp,             -- out   std_logic_vector( 1 downto 0);
-    AXI_rvalid    => rvalid,            -- out   std_logic;
-    AXI_wdata     => wdata,             -- in    std_logic_vector(31 downto 0);
-    AXI_wlast     => wlast(0),          -- in    std_logic;
-    AXI_wready    => wready,            -- out   std_logic;
-    AXI_wstrb     => wstrb,             -- in    std_logic_vector( 3 downto 0);
-    AXI_wvalid    => wvalid,            -- in    std_logic;
-    ARESETN           => aresetn
+    ARESETN           => aresetn,           -- in    std_logic;
+    AXI_araddr        => araddr,            -- in    std_logic_vector(31 downto 0);
+    AXI_arburst       => (others => '0'),           -- in    std_logic_vector( 1 downto 0);
+    AXI_arcache       => (others => '0'),           -- in    std_logic_vector( 3 downto 0);
+    AXI_arid          => (others => '0'),              -- in    std_logic_vector( 5 downto 0);
+    AXI_arlen         => (others => '0'),             -- in    std_logic_vector( 7 downto 0);
+    AXI_arlock        => (others => '0'),            -- in    std_logic_vector( 0 downto 0);
+    AXI_arprot        => (others => '0'),            -- in    std_logic_vector( 2 downto 0);
+    AXI_arqos         => (others => '0'),             -- in    std_logic_vector( 3 downto 0);
+    AXI_arready       => open,           -- out   std_logic;
+    AXI_arregion      => (others => '0'),          -- in    std_logic_vector( 3 downto 0);
+    AXI_arsize        => (others => '0'),            -- in    std_logic_vector( 2 downto 0);
+    AXI_arvalid       => arvalid,           -- in    std_logic;
+    AXI_awaddr        => awaddr,            -- in    std_logic_vector(31 downto 0);
+    AXI_awburst       => "01",           -- in    std_logic_vector( 1 downto 0);
+    AXI_awcache       => (others => '0'),           -- in    std_logic_vector( 3 downto 0);
+    AXI_awid          => (others => '0'),              -- in    std_logic_vector( 5 downto 0);
+    AXI_awlen         => (others => '1'),             -- in    std_logic_vector( 7 downto 0);
+    AXI_awlock        => (others => '0'),            -- in    std_logic_vector( 0 downto 0);
+    AXI_awprot        => (others => '0'),            -- in    std_logic_vector( 2 downto 0);
+    AXI_awqos         => (others => '0'),             -- in    std_logic_vector( 3 downto 0);
+    AXI_awready       => open,           -- out   std_logic;
+    AXI_awregion      => awregion,          -- in    std_logic_vector( 3 downto 0);
+    AXI_awsize        => "010",            -- in    std_logic_vector( 2 downto 0);
+    AXI_awvalid       => awvalid,           -- in    std_logic;
+    AXI_bid           => open,               -- out   std_logic_vector( 5 downto 0);
+    AXI_bready        => '1',            -- in    std_logic;
+    AXI_bresp         => open,             -- out   std_logic_vector( 1 downto 0);
+    AXI_bvalid        => open,            -- out   std_logic;
+    AXI_rdata         => rdata,             -- out   std_logic_vector(31 downto 0);
+    AXI_rid           => open,               -- out   std_logic_vector( 5 downto 0);
+    AXI_rlast         => open,             -- out   std_logic;
+    AXI_rready        => '1',            -- in    std_logic;
+    AXI_rresp         => open,             -- out   std_logic_vector( 1 downto 0);
+    AXI_rvalid        => open,            -- out   std_logic;
+    AXI_wdata         => wdata,             -- in    std_logic_vector(31 downto 0);
+    AXI_wlast         => '0',             -- in    std_logic;
+    AXI_wready        => wready,            -- out   std_logic;
+    AXI_wstrb         => (others => '1'),             -- in    std_logic_vector( 3 downto 0);
+    AXI_wvalid        => wvalid,            -- in    std_logic;
+    DDR_addr          => DDR_addr,          -- inout std_logic_vector(14 downto 0);
+    DDR_ba            => DDR_ba,            -- inout std_logic_vector( 2 downto 0);
+    DDR_cas_n         => DDR_cas_n,         -- inout std_logic;
+    DDR_ck_n          => DDR_ck_n,          -- inout std_logic;
+    DDR_ck_p          => DDR_ck_p,          -- inout std_logic;
+    DDR_cke           => DDR_cke,           -- inout std_logic;
+    DDR_cs_n          => DDR_cs_n,          -- inout std_logic;
+    DDR_dm            => DDR_dm,            -- inout std_logic_vector( 3 downto 0);
+    DDR_dq            => DDR_dq,            -- inout std_logic_vector(31 downto 0);
+    DDR_dqs_n         => DDR_dqs_n,         -- inout std_logic_vector( 3 downto 0);
+    DDR_dqs_p         => DDR_dqs_p,         -- inout std_logic_vector( 3 downto 0);
+    DDR_odt           => DDR_odt,           -- inout std_logic;
+    DDR_ras_n         => DDR_ras_n,         -- inout std_logic;
+    DDR_reset_n       => DDR_reset_n,       -- inout std_logic;
+    DDR_we_n          => DDR_we_n,          -- inout std_logic;
+    FCLK_CLK0         => FCLK_CLK0,         -- out   std_logic;
+    FIXED_IO_ddr_vrn  => FIXED_IO_ddr_vrn,  -- inout std_logic;
+    FIXED_IO_ddr_vrp  => FIXED_IO_ddr_vrp,  -- inout std_logic;
+    FIXED_IO_mio      => FIXED_IO_mio,      -- inout std_logic_vector(53 downto 0);
+    FIXED_IO_ps_clk   => FIXED_IO_ps_clk,   -- inout std_logic;
+    FIXED_IO_ps_porb  => FIXED_IO_ps_porb,  -- inout std_logic;
+    FIXED_IO_ps_srstb => FIXED_IO_ps_srstb  -- inout std_logic_vector
   );
 
 
@@ -351,7 +352,7 @@ u_vio_top : vio_top
     probe_out6     => arprot,
     probe_out7     => arqos,
     probe_out8     => arsize,
-    probe_out9     => arvalid,
+    probe_out9(0)  => arvalid,
     probe_out10    => open,
     probe_out11    => open,
     probe_out12    => awcache,
@@ -365,12 +366,12 @@ u_vio_top : vio_top
     probe_out20    => open,
     probe_out21    => open,
     probe_out22    => open,
-    probe_out23    => wid,
-    probe_out24    => wlast,
+    probe_out23    => open,
+    probe_out24    => open,
     probe_out25    => open,
     probe_out26(0) => burst_go,
     --probe_out26    => open,
-    probe_out27    => aresetn_vector
+    probe_out27(0)    => aresetn
   );
 
 end rtl;
