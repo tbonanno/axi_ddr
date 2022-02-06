@@ -151,48 +151,14 @@ component design_1_wrapper
   );
 end component;
 
-COMPONENT vio_top
+COMPONENT vio_axi
   PORT (
     clk : IN STD_LOGIC;
-    probe_in0 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_in1 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_in2 : IN STD_LOGIC_VECTOR(5 DOWNTO 0);
-    probe_in3 : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-    probe_in4 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_in5 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    probe_in6 : IN STD_LOGIC_VECTOR(5 DOWNTO 0);
-    probe_in7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_in8 : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-    probe_in9 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_in10 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    probe_in0 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     probe_out0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    probe_out1 : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-    probe_out2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    probe_out3 : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
-    probe_out4 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-    probe_out5 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_out6 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    probe_out7 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    probe_out8 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    probe_out9 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_out10 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    probe_out11 : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-    probe_out12 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    probe_out13 : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
-    probe_out14 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-    probe_out15 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_out16 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    probe_out17 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    probe_out18 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    probe_out19 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_out20 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_out21 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_out22 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    probe_out23 : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
-    probe_out24 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_out25 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    probe_out26 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-    probe_out27 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+    probe_out1 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    probe_out2 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    probe_out3 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
   );
 END COMPONENT;
 
@@ -286,7 +252,7 @@ u_design_1_wrapper : design_1_wrapper
     AXI_awprot        => (others => '0'),            -- in    std_logic_vector( 2 downto 0);
     AXI_awqos         => (others => '0'),             -- in    std_logic_vector( 3 downto 0);
     AXI_awready       => open,           -- out   std_logic;
-    AXI_awregion      => awregion,          -- in    std_logic_vector( 3 downto 0);
+    AXI_awregion      => (others => '0'),          -- in    std_logic_vector( 3 downto 0);
     AXI_awsize        => "010",            -- in    std_logic_vector( 2 downto 0);
     AXI_awvalid       => awvalid,           -- in    std_logic;
     AXI_bid           => open,               -- out   std_logic_vector( 5 downto 0);
@@ -329,49 +295,14 @@ u_design_1_wrapper : design_1_wrapper
   );
 
 
-u_vio_top : vio_top
+u_vio_axi : vio_axi
   PORT MAP (
     clk            => FCLK_CLK0,
-    probe_in0(0)   => arready,
-    probe_in1(0)   => awready,
-    probe_in2      => bid,
-    probe_in3      => bresp,
-    probe_in4(0)   => bvalid,
-    probe_in5      => rdata,
-    probe_in6      => rid,
-    probe_in7(0)   => rlast,
-    probe_in8      => rresp,
-    probe_in9(0)   => rvalid,
-    probe_in10(0)  => wready,
+    probe_in0      => rdata,
     probe_out0     => araddr,
-    probe_out1     => arburst,
-    probe_out2     => arcache,
-    probe_out3     => arid,
-    probe_out4     => arlen,
-    probe_out5     => arlock,
-    probe_out6     => arprot,
-    probe_out7     => arqos,
-    probe_out8     => arsize,
-    probe_out9(0)  => arvalid,
-    probe_out10    => open,
-    probe_out11    => open,
-    probe_out12    => awcache,
-    probe_out13    => awid,
-    probe_out14    => open,
-    probe_out15    => awlock,
-    probe_out16    => awprot,
-    probe_out17    => awqos,
-    probe_out18    => open,
-    probe_out19    => open,
-    probe_out20    => open,
-    probe_out21    => open,
-    probe_out22    => open,
-    probe_out23    => open,
-    probe_out24    => open,
-    probe_out25    => open,
-    probe_out26(0) => burst_go,
-    --probe_out26    => open,
-    probe_out27(0)    => aresetn
+    probe_out1(0)  => aresetn,
+    probe_out2(0)  => burst_go,
+    probe_out3(0)  => arvalid
   );
 
 end rtl;
