@@ -61,6 +61,8 @@ architecture rtl of axi_ddr is
   signal awregion      : std_logic_vector( 3 downto 0);
   signal awsize        : std_logic_vector( 2 downto 0);
   signal awvalid       : std_logic;
+  signal awvalid_en_d  : std_logic;
+  signal awvalid_en_q  : std_logic;
   signal bid           : std_logic_vector( 5 downto 0);
   signal bready        : std_logic;
   signal bresp         : std_logic_vector( 1 downto 0);
@@ -177,6 +179,8 @@ process(FCLK_CLK0) begin
     cb_word_q <= cb_word_d;
 
     burst_go_q <= burst_go;
+
+    awvalid_en_q <= awvalid_en_d;
   end if;
 end process;
 
@@ -185,6 +189,8 @@ process(all) begin
 
   cb_count_d <= cb_count_q;
   cb_word_d <= cb_word_q;
+  
+  awvalid_en_d <= awvalid_en_q;
 
   wvalid <= '0';
   awvalid <= '0';
@@ -192,14 +198,23 @@ process(all) begin
   case burst_cur_state is
 
     when IDLE =>
+      awvalid_en_d <= '1';
       if (burst_go = '1' and burst_go_q = '0') then
         burst_nxt_state <= RUN;
       end if;
 
     when RUN =>
       wvalid <= '1';
-      if (cb_word_q(7 downto 0) = "00000000") then
+
+      if (cb_word_q(7 downto 0) = "00000000" and awvalid_en_q = '1') then
         awvalid <= '1';
+        awvalid_en_d <= '0';
+      else
+        awvalid <= '0';
+      end if;
+
+      if (cb_word_q(7 downto 0) = "00000001") then
+        awvalid_en_d <= '1';
       end if;
 
       if (wready = '1') then
